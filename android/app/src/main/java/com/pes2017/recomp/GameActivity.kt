@@ -782,7 +782,9 @@ class GameActivity : AppCompatActivity(), NativeListener {
             "PES17_ASPECT",
             if (prefs.widescreen) String.format(Locale.US, "%.4f", screenAspect()) else "",
         )
-        NativeBridge.nativeSetOption("PES17_NO_SHADOW", if (prefs.lowMemory) "1" else "")
+        // Explicit 0 is important: nativeStart applies its 6 GB low-memory default after these options.
+        // MAX opts into the 512 MB guest-memory shadow cache; Low keeps the memory-saving path.
+        NativeBridge.nativeSetOption("PES17_NO_SHADOW", if (prefs.lowMemory) "1" else "0")
         // Full synchronous precompile at boot when the player asked for it in
         // Settings; otherwise the tiered instant-boot budget + background warmup.
         NativeBridge.nativeSetOption("PES17_SHADER_PREWARM_ALL", if (prefs.prewarmAllShaders) "1" else "")
