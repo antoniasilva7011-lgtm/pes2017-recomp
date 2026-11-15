@@ -763,6 +763,9 @@ class GameActivity : AppCompatActivity(), NativeListener {
         NativeBridge.nativeSetOption("PES17_NO_CROWD", if (prefs.crowd) "" else "1")
         NativeBridge.nativeSetOption("PES17_UPSCALER", if (prefs.fsr) "fsr" else "")
         NativeBridge.nativeSetOption("PES17_FSR_SHARPNESS", String.format(Locale.US, "%.1f", prefs.fsrSharpness))
+        // Performance MAX caps anisotropic filtering at 2x on Adreno 640-class GPUs.
+        // This reduces oblique pitch/stand texture fetches; other presets keep the Android default (4x).
+        NativeBridge.nativeSetOption("PES17_MAX_ANISO", if (prefs.preset == "MAX") "2" else "")
         // For trying other caps without a rebuild: a number in files/fps_limit
         // (adb shell "echo 40 > /sdcard/Android/data/com.pes2017.recomp/files/fps_limit") wins over the switch.
         val fpsOverride = try {
