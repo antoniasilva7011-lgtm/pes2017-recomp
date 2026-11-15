@@ -8,7 +8,7 @@ import android.os.Build
 import java.io.File
 
 /**
- * What this phone can carry, as one of three tiers, and the settings each tier
+ * What this phone can carry, as three detected tiers plus a manual MAX preset, and the settings each tier
  * starts from. The match is GPU-bound first (docs/performance.md), so the GPU
  * decides the tier; the CPU and the memory can only pull it down.
  *
@@ -26,7 +26,7 @@ import java.io.File
  */
 object DeviceProfile {
 
-    enum class Tier { LOW, MEDIUM, HIGH }
+    enum class Tier { LOW, MEDIUM, HIGH, MAX }
 
     /** What the classifier saw, for the Settings line and the capture summary. */
     data class Specs(
@@ -59,6 +59,9 @@ object DeviceProfile {
         Tier.HIGH -> Preset(75, multisampling = true, fsr = false, fpsLimit = 60, lowMemory = false, heatScale = true, loadScale = false)
         Tier.MEDIUM -> Preset(75, multisampling = true, fsr = true, fpsLimit = 60, lowMemory = false, heatScale = true, loadScale = true)
         Tier.LOW -> Preset(60, multisampling = false, fsr = true, fpsLimit = 30, lowMemory = true, heatScale = true, loadScale = false)
+        // MAX is a manual, Adreno-640-class profile: keep a 60 fps target while
+        // reducing the most expensive scene work and letting FSR restore edge detail.
+        Tier.MAX -> Preset(70, multisampling = false, fsr = true, fpsLimit = 60, lowMemory = false, heatScale = true, loadScale = true)
     }
 
     fun apply(prefs: Prefs, tier: Tier) {
@@ -70,6 +73,15 @@ object DeviceProfile {
         prefs.lowMemory = p.lowMemory
         prefs.heatScale = p.heatScale
         prefs.loadScale = p.loadScale
+        if (tier == Tier.MAX) {
+            // Avoid frame generation's 30 fps game-side cap; prefer native frame pacing.
+            prefs.frameGeneration = false
+            prefs.renderScale = 1
+            prefs.crowd = false
+            prefs.perfHint = true
+            prefs.textureBudgetMB = 0 // let the native cache size itself from device memory
+            prefs.fsrSharpness = 0.2f
+        }
         prefs.preset = tier.name
     }
 
@@ -84,7 +96,11 @@ object DeviceProfile {
             prefs.preset = PRESET_CUSTOM
             return
         }
-        apply(prefs, detect(context, prefs).tier)
+        val detected = detect(context, prefs)
+        val adreno640Max = detected.tier == Tier.MEDIUM &&
+            Regex("adreno[^0-9]*640").containsMatchIn(detected.specs.gpu.lowercase()) &&
+            detected.specs.fastCores >= 4 && detected.specs.totalMemoryMB >= 4600
+        apply(prefs, if (adreno640Max) Tier.MAX else detected.tier)
     }
 
     fun detect(context: Context, prefs: Prefs): Result {
