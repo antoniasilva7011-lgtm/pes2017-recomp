@@ -1,0 +1,62 @@
+name: Build PES17 Performance APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "android/app/src/main/java/com/pes2017/recomp/DeviceProfile.kt"
+      - ".github/workflows/android-performance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager "ndk;28.2.13676358"
+
+      - name: Reuse upstream native game runtime
+        run: |
+          curl -fL --retry 3 \
+            "https://github.com/dzakyraf/pes2017-recomp/releases/download/0.2.0/pes2017-recomp-0.2.0.apk" \
+            -o /tmp/upstream-pes17.apk
+          mkdir -p "$GITHUB_WORKSPACE/prebuilt-native"
+          unzip -oj /tmp/upstream-pes17.apk 'lib/arm64-v8a/*.so' -d "$GITHUB_WORKSPACE/prebuilt-native"
+          test -s "$GITHUB_WORKSPACE/prebuilt-native/libpes17.so"
+
+      - name: Build optimized APK
+        env:
+          PES17_VERSION_NAME: "0.2.1-performance"
+          PES17_VERSION_CODE: "41"
+          PES17_NATIVE_OPTIMISATION: "-O2"
+          PES17_BUILD_SHA: ${{ github.sha }}
+          PES17_BUILD_STAMP: ${{ github.run_number }}
+        run: |
+          chmod +x android/gradlew
+          cd android
+          ./gradlew --no-daemon assembleRelease \
+            -PprebuiltNative="$GITHUB_WORKSPACE/prebuilt-native"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: PES17-Performance-MAX-APK
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 14
