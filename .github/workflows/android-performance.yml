@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - "android/app/src/main/java/com/pes2017/recomp/DeviceProfile.kt"
       - ".github/workflows/android-performance.yml"
   workflow_dispatch:
 
