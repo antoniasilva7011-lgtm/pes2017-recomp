@@ -230,6 +230,7 @@ class SettingsActivity : AppCompatActivity() {
             R.id.preset_low to DeviceProfile.Tier.LOW,
             R.id.preset_medium to DeviceProfile.Tier.MEDIUM,
             R.id.preset_high to DeviceProfile.Tier.HIGH,
+            R.id.preset_max to DeviceProfile.Tier.MAX,
         ).forEach { (id, tier) ->
             findViewById<Button>(id).setOnClickListener {
                 DeviceProfile.apply(prefs, tier)
@@ -254,6 +255,7 @@ class SettingsActivity : AppCompatActivity() {
             DeviceProfile.Tier.LOW.name -> R.string.preset_low
             DeviceProfile.Tier.MEDIUM.name -> R.string.preset_medium
             DeviceProfile.Tier.HIGH.name -> R.string.preset_high
+            DeviceProfile.Tier.MAX.name -> R.string.preset_max
             else -> R.string.preset_custom
         },
     )
