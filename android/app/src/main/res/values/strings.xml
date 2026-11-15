@@ -256,6 +256,7 @@
     <string name="preset_low">Low</string>
     <string name="preset_medium">Medium</string>
     <string name="preset_high">High</string>
+    <string name="preset_max">MAX</string>
     <string name="preset_custom">Custom</string>
     <string name="preset_detected">This phone looks like %1$s (%2$s; %3$s, %4$d fast cores at %5$d MHz, %6$.1f GB). A preset sets render quality, the heat and GPU-load rules, multisampling, FSR, the frame-rate limit and low-memory mode; change any of them afterwards and the preset reads Custom.</string>
     <string name="preset_gpu_unknown">GPU unknown</string>
