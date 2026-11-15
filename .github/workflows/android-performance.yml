@@ -6,6 +6,7 @@ on:
     paths:
       - "android/app/src/main/java/com/pes2017/recomp/DeviceProfile.kt"
       - "android/app/src/main/java/com/pes2017/recomp/SettingsActivity.kt"
+      - "android/app/src/main/java/com/pes2017/recomp/GameActivity.kt"
       - "android/app/src/main/res/layout/activity_settings.xml"
       - "android/app/src/main/res/values/strings.xml"
       - ".github/workflows/android-performance.yml"
