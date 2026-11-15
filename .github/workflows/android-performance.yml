@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
     paths:
+      - "android/app/src/main/java/com/pes2017/recomp/DeviceProfile.kt"
+      - "android/app/src/main/java/com/pes2017/recomp/SettingsActivity.kt"
+      - "android/app/src/main/res/layout/activity_settings.xml"
+      - "android/app/src/main/res/values/strings.xml"
       - ".github/workflows/android-performance.yml"
   workflow_dispatch:
 
@@ -44,8 +48,8 @@ jobs:
 
       - name: Build optimized APK
         env:
-          PES17_VERSION_NAME: "0.2.1-performance"
-          PES17_VERSION_CODE: "41"
+          PES17_VERSION_NAME: "0.2.2-performance-max"
+          PES17_VERSION_CODE: "42"
           PES17_NATIVE_OPTIMISATION: "-O2"
           PES17_BUILD_SHA: ${{ github.sha }}
           PES17_BUILD_STAMP: ${{ github.run_number }}
