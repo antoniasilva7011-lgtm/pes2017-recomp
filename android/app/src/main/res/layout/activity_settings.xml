@@ -124,6 +124,15 @@
                             android:layout_weight="1"
                             android:text="@string/preset_high" />
 
+                        <Button
+                            android:id="@+id/preset_max"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:minWidth="0dp"
+                            android:text="@string/preset_max" />
+
                     </LinearLayout>
 
                     <TextView
